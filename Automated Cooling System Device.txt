@@ -1,0 +1,79 @@
+#define buzzer 13
+
+int celsius = 0;
+const int Motor_pin = 5;
+int flag,Speed;
+
+void setup()
+{
+  pinMode(A0, INPUT);
+  Serial.begin(9600);
+  pinMode (buzzer, OUTPUT);
+  pinMode(Motor_pin, OUTPUT);
+ 
+  pinMode(2, OUTPUT);
+  pinMode(3, OUTPUT);
+  pinMode(4, OUTPUT);
+  Serial.println("Enter value from 50 to 225");
+}
+
+void loop()
+{
+  // measure temperature in Celsius
+
+  
+  int reading = analogRead(celsius);
+  float voltage = reading * 5.0;
+  voltage /= 1024.0;
+  
+  float celsius = (voltage - 0.5)*100;
+  Serial.print("Temperature is ");
+  Serial.print(celsius);
+  Serial.println("Celsius");
+  
+  if (celsius <= 27) {
+    digitalWrite(2, HIGH);
+    digitalWrite(3, LOW);
+    digitalWrite(4, LOW);
+    digitalWrite(buzzer,HIGH);
+   	analogWrite(Motor_pin, HIGH);
+    Serial.println("Temperature is COLD");
+  }
+  if (celsius >= 27 && celsius <=37) {
+    digitalWrite(2, LOW);
+    digitalWrite(3, HIGH);
+    digitalWrite(4, LOW);
+    digitalWrite(buzzer, LOW);
+    analogWrite(Motor_pin, HIGH);
+    Serial.println("Temperature is WARM");
+  }
+  if (celsius >= 37) {
+    digitalWrite(2, LOW);
+    digitalWrite(3, LOW);
+    digitalWrite(4, HIGH);
+    digitalWrite(buzzer, HIGH);
+    analogWrite(Motor_pin, HIGH);
+     Serial.println("Temperature is HOT");
+  }
+  
+  delay(1000); // Wait for 1000 millisecond(s)
+  
+  if (Serial.available()>0) // Checking if data is present in serial buffer or not.
+  {
+    Speed=Serial.parseInt(); // Reading data from Serial Buffer.
+    flag=0;
+  }
+
+  if (Speed>=50 && Speed<=255)                
+  {
+    analogWrite(Motor_pin,Speed); // Sending the PWM signal to arduino pin 3.
+
+    if (flag==0)
+    {
+      Serial.print("Current speed is ");
+      Serial.print(Speed);
+      Serial.println(" PWM");
+      flag=1;
+    }
+  }
+}
